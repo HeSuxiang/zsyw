@@ -3,6 +3,7 @@ package zsyw;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.FlowLayout;
+import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -11,6 +12,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.util.ArrayList;
 
 import javax.swing.JButton;
@@ -24,7 +27,7 @@ import javax.swing.JTextField;
 public class zsyw extends JFrame {
 	private static int ResultChuHuo = 0;
 	private static int ResultTuiHuo = 0;
-	private static int ResultPercent = 0;
+	private static String ResultPercent = "";
 
 	private static ArrayList<Chuhuo> listChuhuo = null;
 	private static ArrayList<Tuihuo> listTuihuo = null;
@@ -224,7 +227,7 @@ public class zsyw extends JFrame {
 	}
 
 	public void showWindow() {
-		this.setTitle("我是薄荷啊呀呀 Beta 1.1");// 窗体名称为“聊天”
+		this.setTitle("我是薄荷啊呀呀 Beta 1.2");// 窗体名称为“聊天”
 		this.setSize(600, 300);// 窗体大小为600*500
 		this.setLocation(200, 200);// 窗体位置距屏幕左上角为200*200
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);// 关闭窗口命令
@@ -263,15 +266,23 @@ public class zsyw extends JFrame {
 		//jp3.add(jtf3);
 
 		jta1 = new JTextArea();// 创建文本区
+		Font font=new Font("宋体",Font.PLAIN,18);
+				
+		jta1.setFont(font);
+		
 		jta1.setSize(getMaximumSize());
 		jta1.setText("出货: " + "\n退货: " + "\n退货率: ");
+		
 		jta2 = new JTextArea();// 创建文本区
-		jta1.setSize(getMaximumSize());
-		jta2.setBackground(Color.red);
+		jta2.setFont(font);
+		//jta1.setSize(getMaximumSize());
+		//jta2.setBackground(Color.red);
+		
 		jp4.add(jb1);
-
+		
 		jp5.add(jta1);
 		jp6.add(jta2);
+		
 		jb1.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -302,7 +313,8 @@ public class zsyw extends JFrame {
 						} catch (Exception e1) {
 							// TODO Auto-generated catch block
 							listChuhuo = null;
-							jta2.setText("读取文件失败, 请确认文件存在\nD:\\统计.xls");
+							jta1.setText("\n读取文件失败, 请确认文件存在\nD:\\统计.xls\n");
+							jta1.setBackground(Color.red);
 							e1.printStackTrace();
 							
 							
@@ -342,13 +354,26 @@ public class zsyw extends JFrame {
 	protected void ShowResult() {
 		System.out.println("ShowResult!");
 
+		//float percent = (float) ResultTuiHuo / (float) ResultChuHuo;
+		
+		BigDecimal d1 = new BigDecimal(Integer.toString(ResultTuiHuo));
+        BigDecimal d2 = new BigDecimal(Integer.toString(ResultChuHuo));
+        BigDecimal d100 = new BigDecimal(Integer.toString(100));
+        
+        ResultPercent = (d1.multiply(d100).divide(d2,6,BigDecimal.ROUND_HALF_UP)).toString();
+		//NumberFormat nf =NumberFormat.getInstance();
+
+		//nf.setGroupingUsed(false);
+
+		//ResultPercent= nf.format(Float.toString(percent));
+		
 		// TODO Auto-generated method stub
 		jta1.setText("客户: " + jtf1.getText() +
 				"\n型号: " + jtf2.getText() +
 				"\n出货: " + ResultChuHuo + 
 				"\n退货: " + ResultTuiHuo + 
 				"\n异常类型: " + jcbb.getSelectedItem() +
-				 "\n退货率: "+ (float) ResultTuiHuo / (float) ResultChuHuo);
+				 "\n退货率: "+ ResultPercent + "%");
 		 
 		jta1.setBackground(Color.cyan);
 
@@ -461,8 +486,9 @@ public class zsyw extends JFrame {
 
 				// 未找到异常类型 ,报错
 				case 0:
-					jta2.append ("\n三次过滤异常 未找到异常类型 ,报错");
-					
+					jta1.append ("\n三次过滤异常 未找到异常类型 ,报错");
+					jta1.setBackground(Color.red);
+
 					System.out.println(" 三次过滤异常 未找到异常类型 ,报错");
 					ResultTuiHuo = 0;
 					return;
@@ -844,7 +870,7 @@ public class zsyw extends JFrame {
 		}
 
 		else{
-			jta2.setText("获取异常类型出错, 请确认输入无误 ,报错");
+			jta1.setText("获取异常类型出错, 请确认输入无误 ,报错");
 			System.out.println(" 获取异常类型出错, 请确认输入无误 ,报错");
 		return 0;
 		}
